@@ -21,6 +21,10 @@ class BAPS:
             raise NotImplementedError('The combination rule is not defined.')
         return self.comb_rule(self, other)
 
+    @property
+    def empty(self):
+        return 1 - self.true - self.false - self.unknown
+
     def check_valid(self):
         assert 0.0 <= self.true <= 1.0, 'Unvalid value true = {}'.format(self.true)
         assert 0.0 <= self.false <= 1.0, 'Unvalid value false = {}'.format(self.false)
