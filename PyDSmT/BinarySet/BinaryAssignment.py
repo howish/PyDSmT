@@ -25,7 +25,11 @@ class BAPS:
         return self.comb_rule(self, other)
 
     @property
-    def empty(self):
+    def vals(self) -> tuple:
+        return self.true, self.false, self.unknown, self.empty
+
+    @property
+    def empty(self) -> float :
         return 1 - self.true - self.false - self.unknown
 
     def check_valid(self):
@@ -35,3 +39,5 @@ class BAPS:
         assert self.true + self.false <= 1.0, \
             'Unvalid value true + false + unknown = {}'.format(self.true + self.false + self.unknown)
 
+
+BA = BAPS
