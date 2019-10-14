@@ -39,7 +39,7 @@ def PCR3(a: BA, b: BA) -> BA:
     c = conjunctive_rule(a, b)
     t = c.true + sum(ts) * (PCR3_f1(ts, fs) + PCR3_f1(ts, es))
     f = c.false + sum(fs) * (PCR3_f1(fs, ts) + PCR3_f1(fs, es))
-    u = c.unknown + sum(us) * (PCR3_f1(us, es)) + 2 * norm(es)
+    u = c.unknown + sum(us) * (PCR3_f1(us, es))
     return BA(t, f, u)  #TODO
 
 
@@ -51,9 +51,9 @@ def PCR4_f1(n: float, m: float) -> float:
 def PCR4(a: BA, b: BA) -> BA:
     c = conjunctive_rule(a, b)
     st, sf, su, se = c.vals
-    t = c.true * (1 + se * (PCR4_f1(st, sf) + PCR4_f1(st, se)))
-    f = c.false * (1 + se * (PCR4_f1(sf, st) + PCR4_f1(sf, se)))
-    u = c.unknown * (1 + se * PCR4_f1(su, se))
+    t = c.true * (1 + se * PCR4_f1(st, sf))
+    f = c.false * (1 + se * PCR4_f1(sf, st))
+    u = c.unknown
     return BA(t, f, u)
 
 

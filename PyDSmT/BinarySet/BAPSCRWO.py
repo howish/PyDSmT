@@ -1,3 +1,4 @@
+from types import FunctionType
 from PyDSmT.BinarySet.BAPSCRBasic import BA, conjunctive_rule
 from PyDSmT.BinarySet.BAPSCRUtils import unwrapPairValues
 
@@ -10,13 +11,17 @@ class WeightedOperator:
         self.weight_func = weight_func
         self.true_weight = 0.0
         self.false_weight = 0.0
-
-    @property
-    def unknown_weight(self):
-        return 1 - self.true_weight - self.false_weight
+        self.unknown_weight = 0.0
 
     def compute_weights(self, a: BA, b: BA):
-        self.true_weight, self.false_weight = self.weight_func(a, b)
+        weights = self.weight_func(a, b)
+        if len(weights) == 2:
+            self.true_weight, self.false_weight = weights
+            self.unknown_weight = 1 - sum(weights)
+        elif len(weights) == 3:
+            self.true_weight, self.false_weight, self.unknown_weight = weights
+        else:
+            raise ValueError('Unknown weights length')
 
     def __call__(self, a: BA, b: BA):
         self.compute_weights(a, b)
@@ -29,16 +34,18 @@ class WeightedOperator:
 
 
 class ConstantWeight:
-    def __init__(self, true_weight, false_weight):
+    def __init__(self, true_weight, false_weight, unknown_weight=None):
         self.true_weight = true_weight
         self.false_weight = false_weight
+        self.unknown_weight = unknown_weight if unknown_weight is not None \
+            else 1 - true_weight - false_weight
 
-    def __call__(self, *args, **kwargs):
-        return self.true_weight, self.false_weight
+    def __call__(self, a: BA, b: BA) -> tuple:
+        return self.true_weight, self.false_weight, self.unknown_weight
 
 
 # =============================================================================
-# Re-implement the basic rules
+# Basic rules
 # =============================================================================
 def Dempsters_weights(a: BA, b: BA) -> tuple:
     c = conjunctive_rule(a, b)
@@ -47,10 +54,11 @@ def Dempsters_weights(a: BA, b: BA) -> tuple:
 
 
 Yagers_weights = ConstantWeight(0, 0)
+Smets_weights = ConstantWeight(0, 0, 0)
 
 
 # =============================================================================
-# PCR1
+# PCRs
 # Notice that PCR1 == WAO for binary assignment
 # =============================================================================
 def PCR1_Weights(a: BA, b: BA) -> tuple:
@@ -59,16 +67,18 @@ def PCR1_Weights(a: BA, b: BA) -> tuple:
     return sum(ts) / d, sum(fs) / d
 
 
-WAO = PCR1_WO = WeightedOperator(PCR1_Weights)
-
-
-# =============================================================================
-# PCR2
-# =============================================================================
 def PCR2_Weights(a: BA, b: BA) -> tuple:
     ts, fs, _, _ = unwrapPairValues(a, b)
     d = sum(ts) + sum(fs)
     return sum(ts) / d, sum(fs) / d
 
 
-PCR2_WO = WeightedOperator(PCR1_Weights)
+# =============================================================================
+# Re-implement operators by WO
+# =============================================================================
+Dempsters_rule = WeightedOperator(Dempsters_weights)
+Yagers_rule = WeightedOperator(Yagers_weights)
+Smets_rule = WeightedOperator(Smets_weights)
+
+PCR1_WO = WAO = WeightedOperator(PCR1_Weights)
+PCR2_WO = WeightedOperator(PCR2_Weights)
