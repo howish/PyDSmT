@@ -26,7 +26,7 @@ def disjunctive_rule(a: BA, b: BA) -> BA:
 #
 # Notice that:
 # 1. Smet's rule is the only one assign mass on empty set.
-# 2. In spite of fact 1, we shouldn't assume source assigment with
+# 2. In addition to fact 1, we shouldn't assume source assigment with
 #    empty assignment 0
 # 3. The Yager's rule and the Dubois Prade's rule are the same when
 #    applied on binary assignment.

@@ -7,11 +7,12 @@ class BAPS:
     """
     comb_rule = None
 
-    def __init__(self, true: float, false: float, unknown: float):
+    def __init__(self, true: float, false: float, unknown: float = None):
         self.true = true
         self.false = false
+        if unknown is None:
+            unknown = 1.0 - true - false
         self.unknown = unknown
-
         self.check_valid()
 
     def __str__(self):
@@ -38,7 +39,7 @@ class BAPS:
         assert 0.0 <= self.true <= 1.0, 'Unvalid value true = {}'.format(self.true)
         assert 0.0 <= self.false <= 1.0, 'Unvalid value false = {}'.format(self.false)
         assert 0.0 <= self.unknown <= 1.0, 'Unvalid value unknown = {}'.format(self.unknown)
-        assert self.true + self.false <= 1.0, \
+        assert self.true + self.false + self.unknown <= 1.0 + 1e-6, \
             'Unvalid value true + false + unknown = {}'.format(self.true + self.false + self.unknown)
 
 
